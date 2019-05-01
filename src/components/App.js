@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../stylesheets/App.scss';
 import {Loading} from './Loading';
+import { Container, Row, Col } from 'react-bootstrap';
+import Abilities from './Abilities';
+
 
 class App extends Component {
 
@@ -12,13 +15,13 @@ class App extends Component {
       nextUrl: null,
       previousUrl: null,
       selectedPokemon: {},
-      dummyButtonClickCount: 0
+      dummyButtonClickCount: 0,
     }
   }
 
   componentDidMount() {
     // setTimeout(callback, milliseconds) - just so you can see the loading animation ;)
-    setTimeout(() => {this.getData('https://pokeapi.co/api/v2/pokemon')}, 3000);
+    setTimeout(() => {this.getData('https://pokeapi.co/api/v2/pokemon')}, 100);    
   }
 
   getData(url) {
@@ -35,9 +38,13 @@ class App extends Component {
   }
 
   getPokemonDetails(url) {
-    // implement a fetch call
-    // call setState() to update the selectedPokemon in state
-    
+    fetch(url) 
+    .then(response => response.json())
+    .then(data => {
+      this.setState({
+        selectedPokemon: data
+      })
+    })
   }
 
   handleNextClick = () => {
@@ -45,14 +52,11 @@ class App extends Component {
   }
 
   handlePreviousClick = () => {
-    alert("make me work");
-    // pretty much the same as handleNextClick()
+    this.getData(this.state.previousUrl);
   }
 
   handlePokemonClick = (url) => {
-    alert("go get data from " + url);
-    // then update the slectedPokemon in state
-    // then use that data in render()
+    this.getPokemonDetails(url);
   }
 
   render() {
@@ -74,8 +78,15 @@ class App extends Component {
       }
     )
 
+
     return (
       <div className="app">
+        <Container>
+          <Row>
+            <Col>Column 1</Col>
+            <Col>Column 2</Col>
+          </Row>
+        </Container>
         <button onClick={this.handlePreviousClick}>Previous</button>
         <button onClick={this.handleNextClick}>Next</button>
         <Loading visible={this.state.loading} />
@@ -88,6 +99,12 @@ class App extends Component {
         <div className="selected-pokemon">
           <div className="name">{this.state.selectedPokemon.name}</div>
           {/* add some details */}
+          <div>{this.state.selectedPokemon.weight}</div>
+
+          {this.state.selectedPokemon.abilities && 
+            <Abilities abilityList={this.state.selectedPokemon.abilities} />
+          }
+          
         </div>
       </div>
     )
